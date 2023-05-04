@@ -9,4 +9,6 @@
 @interface MatrixUniversalSdk : NSObject <RCTBridgeModule>
 #endif
 
+#define kUserSession @"UserSession"
+
 @end

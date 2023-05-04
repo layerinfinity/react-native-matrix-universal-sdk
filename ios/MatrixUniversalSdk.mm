@@ -15,6 +15,14 @@ RCT_REMAP_METHOD(multiply,
     resolve(result);
 }
 
+- (NSArray<NSString *> *)supportedEvents
+{
+  return
+  @[
+    kUserSession
+  ];
+}
+
 // Don't compile this code when we build for the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

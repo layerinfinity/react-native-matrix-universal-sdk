@@ -14,9 +14,15 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0" }
   s.source       = { :git => "https://github.com/layerinfinity/react-native-matrix-universal-sdk.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,mm}"
+  s.source_files = "ios/**/*.{h,m,mm,swift}"
 
   s.dependency "React-Core"
+
+  # Third parties
+  s.dependency 'OLMKit', '~> 3.2.5'
+  s.dependency 'Realm', '10.27.0'
+  s.dependency 'libbase58', '~> 0.1.4'
+  s.dependency 'MatrixSDKCrypto', '0.3.4', :configurations => ["DEBUG", "RELEASE"], :inhibit_warnings => true
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
@@ -32,4 +38,6 @@ Pod::Spec.new do |s|
     s.dependency "RCTTypeSafety"
     s.dependency "ReactCommon/turbomodule/core"
   end
+
+  install_modules_dependencies(s)
 end
