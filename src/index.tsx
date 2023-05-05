@@ -1,5 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
+console.log('aaaaaa', NativeModules);
+
 const LINKING_ERROR =
   `The package 'react-native-matrix-universal-sdk' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
