@@ -19,10 +19,13 @@ Pod::Spec.new do |s|
   s.dependency "React-Core"
 
   # Third parties
-  s.dependency 'OLMKit', '~> 3.2.5'
-  s.dependency 'Realm', '10.27.0'
-  s.dependency 'libbase58', '~> 0.1.4'
-  s.dependency 'MatrixSDKCrypto', '0.3.4', :configurations => ["DEBUG", "RELEASE"], :inhibit_warnings => true
+  s.dependency 'MatrixSDK'
+  s.dependency 'AFNetworking'
+  s.dependency 'GZIP'
+  s.dependency 'OLMKit'
+  s.dependency 'Realm'
+  s.dependency 'libbase58'
+  # s.dependency 'MatrixSDKCrypto', '0.3.4', :configurations => ["DEBUG", "RELEASE"], :inhibit_warnings => true
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
