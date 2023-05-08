@@ -25,6 +25,8 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libMatrixUniversalSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMatrixUniversalSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3E7B5881CC2AC0600A0062D /* MatrixUniversalSdk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatrixUniversalSdk.h; sourceTree = "<group>"; };
+		ED81E1922A08DD310008C108 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
+		ED81E1932A08DD310008C108 /* Utilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utilities.m; sourceTree = "<group>"; };
 		EDC4B37B2A0509AC00A4B0AD /* MatrixUniversalSdk-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MatrixUniversalSdk-Bridging-Header.h"; sourceTree = "<group>"; };
 		EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixUniversalSdk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -51,6 +53,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				ED81E1922A08DD310008C108 /* Utilities.h */,
+				ED81E1932A08DD310008C108 /* Utilities.m */,
 				EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */,
 				B3E7B5881CC2AC0600A0062D /* MatrixUniversalSdk.h */,
 				EDC4B37B2A0509AC00A4B0AD /* MatrixUniversalSdk-Bridging-Header.h */,
