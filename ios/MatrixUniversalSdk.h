@@ -1,14 +1,12 @@
-
-#ifdef RCT_NEW_ARCH_ENABLED
-#import "RNMatrixUniversalSdkSpec.h"
-
-@interface MatrixUniversalSdk : NSObject <NativeMatrixUniversalSdkSpec>
+#if __has_include("RCTBridgeModule.h")
+#import "RCTBridgeModule.h"
 #else
 #import <React/RCTBridgeModule.h>
+#endif
 
 
 // Will expose a RN_MatrixSdk native module to JS
-@interface RCT_EXTERN_REMAP_MODULE(RN_MatrixSdk, RNMatrixSDK, NSObject)
+@interface RCT_EXTERN_REMAP_MODULE(RN_MatrixSdk, MatrixUniversalSdk, NSObject)
 
 + (BOOL)requiresMainQueueSetup
 {
