@@ -6,6 +6,10 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		EDC4B37D2A0509AD00A4B0AD /* MatrixUniversalSdk.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		58B511D91A9E6C8500147676 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -21,7 +25,8 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libMatrixUniversalSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMatrixUniversalSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3E7B5881CC2AC0600A0062D /* MatrixUniversalSdk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatrixUniversalSdk.h; sourceTree = "<group>"; };
-		EDC4B3732A05012400A4B0AD /* MatrixUniversalSdk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixUniversalSdk.swift; sourceTree = "<group>"; };
+		EDC4B37B2A0509AC00A4B0AD /* MatrixUniversalSdk-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MatrixUniversalSdk-Bridging-Header.h"; sourceTree = "<group>"; };
+		EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixUniversalSdk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,8 +51,9 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				EDC4B3732A05012400A4B0AD /* MatrixUniversalSdk.swift */,
+				EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */,
 				B3E7B5881CC2AC0600A0062D /* MatrixUniversalSdk.h */,
+				EDC4B37B2A0509AC00A4B0AD /* MatrixUniversalSdk-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -83,6 +89,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -109,6 +116,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDC4B37D2A0509AD00A4B0AD /* MatrixUniversalSdk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +221,8 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -223,12 +233,17 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = MatrixUniversalSdk;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MatrixUniversalSdk-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
@@ -239,6 +254,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = MatrixUniversalSdk;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MatrixUniversalSdk-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
