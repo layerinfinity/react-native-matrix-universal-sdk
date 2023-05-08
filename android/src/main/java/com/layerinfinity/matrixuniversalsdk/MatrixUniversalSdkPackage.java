@@ -1,4 +1,4 @@
-package com.matrixuniversalsdk;
+package com.layerinfinity.matrixuniversalsdk;
 
 import androidx.annotation.Nullable;
 

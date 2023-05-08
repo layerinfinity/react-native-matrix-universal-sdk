@@ -120,7 +120,7 @@ class RNMatrixSDK: RCTEventEmitter {
     @objc(startSession:rejecter:)
     func startSession(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         // when session is set and connected return the connected session
-        if mxSession != nil && (mxSession.state == MXSessionStateInitialised || mxSession.state == MXSessionStateRunning) {
+        if mxSession != nil && (mxSession.state == MXSessionState.initialised || mxSession.state == MXSessionState.running) {
             // TODO: refactor to getMyUser and reuse
             let user = self.mxSession.myUser
             resolve([
@@ -417,7 +417,7 @@ class RNMatrixSDK: RCTEventEmitter {
             return
         }
 
-        let recentEvents = mxSession.roomsSummaries()
+        let recentEvents = mxSession.roomSummary(withRoomId: nil)
 
         let response = recentEvents.map({
             (roomLastEvent: [MXRoomSummary]) -> [[String: Any]] in
