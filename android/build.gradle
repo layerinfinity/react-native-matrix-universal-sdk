@@ -80,12 +80,13 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.matrix.android:olm:3.2.8"
+  implementation 'org.matrix.android:matrix-android-sdk2:1.2.1'
 }
 
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
     libraryName = "MatrixUniversalSdk"
-    codegenJavaPackageName = "com.matrixuniversalsdk"
+    codegenJavaPackageName = "com.layerinfinity.matrixuniversalsdk"
   }
 }
