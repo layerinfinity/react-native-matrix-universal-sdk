@@ -1,13 +1,27 @@
 package com.layerinfinity.matrixuniversalsdk;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
+import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey;
 
 import org.matrix.android.sdk.api.Matrix;
 import org.matrix.android.sdk.api.MatrixConfiguration;
+import org.matrix.android.sdk.api.SyncConfig;
+import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig;
+import org.matrix.android.sdk.api.crypto.MXCryptoConfig;
 import org.matrix.android.sdk.api.session.Session;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Objects;
+
+import okhttp3.ConnectionSpec;
 
 
 public class MatrixUniversalSdkModule extends ReactContextBaseJavaModule {
@@ -47,28 +61,46 @@ public class MatrixUniversalSdkModule extends ReactContextBaseJavaModule {
   }
 
   // TODO: Maybe use this? https://developer.android.com/topic/libraries/app-startup
-  public Matrix initMatrix() {
-    MatrixConfiguration configuration = new MatrixConfiguration(
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      true,
-      null,
-      new RoomDisplayNameFallbackProviderImpl(),
-      true,
-      null,
-      null,
-      null,
-      null
-    );
+  // Must be used first
+  @ReactMethod
+  public void createClient(ReadableMap params) {
+    try {
+      MatrixConfiguration configuration = new MatrixConfiguration(
+        "Default-application-flavor", // applicationFlavor
+        new MXCryptoConfig(),
+        "https://scalar.vector.im/",
+        "https://scalar.vector.im/api",
+        // integrationWidgetUrls
+        Arrays.asList("https://scalar.vector.im/_matrix/integrations/v1",
+          "https://scalar.vector.im/api",
+          "https://scalar-staging.vector.im/_matrix/integrations/v1",
+          "https://scalar-staging.vector.im/api",
+          "https://scalar-staging.riot.im/scalar/api"),
+        null, // clientPermalinkBaseUrl
+        null, // proxy
+        ConnectionSpec.RESTRICTED_TLS,
+        true,
+        null,
+        new RoomDisplayNameFallbackProviderImpl(),
+        true,
+        Collections.emptyList(),
+        new SyncConfig(), // syncConfig
+        Collections.emptyList(), // metricPlugins
+        null
+      );
 
-    matrix = new Matrix(ctx, configuration);
+      matrix = new Matrix(ctx, configuration);
+      HomeServerConnectionConfig config = new HomeServerConnectionConfig.Builder()
+        .withHomeServerUri(Uri.parse(params.getString(HomeServerKey.BASE_URL)))
+        .build();
+    } catch (Exception e) {
+      // Catch here
+    }
+  }
 
-    return matrix;
+  @ReactMethod
+  public void loginWithToken(String token) {
+    // Try this.
+    matrix.authenticationService().getLoginWizard().loginWithToken(token, null);
   }
 }
