@@ -2,21 +2,13 @@ package com.layerinfinity.matrixuniversalsdk;
 
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
 
-import org.json.JSONException;
+import org.matrix.android.sdk.api.Matrix;
+import org.matrix.android.sdk.api.MatrixConfiguration;
+import org.matrix.android.sdk.api.session.Session;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 
 public class MatrixUniversalSdkModule extends ReactContextBaseJavaModule {
   public static final String NAME = "MatrixUniversalSdk";
@@ -26,15 +18,14 @@ public class MatrixUniversalSdkModule extends ReactContextBaseJavaModule {
   public static final String E_NETWORK_ERROR = "E_NETWORK_ERROR";
   public static final String E_UNEXCPECTED_ERROR = "E_UNKNOWN_ERROR";
 
-
-  /**
-   * Used when loading old messages
-   */
-  private HashMap<String, String> roomPaginationTokens = new HashMap<>();
+  ReactApplicationContext ctx;
 
   MatrixUniversalSdkModule(ReactApplicationContext context) {
     super(context);
+    ctx = context;
   }
+
+  private Matrix matrix;
 
   @Override
   @NonNull
@@ -42,5 +33,42 @@ public class MatrixUniversalSdkModule extends ReactContextBaseJavaModule {
     return NAME;
   }
 
+  public Session getLastSession() {
+    Session lastSession = matrix.authenticationService().getLastAuthenticatedSession();
+    if (lastSession != null) {
+      SessionHolder.currentSession = lastSession;
+      // Don't forget to open the session and start syncing.
 
+      lastSession.open();
+      lastSession.syncService().startSync(true);
+    }
+
+    return lastSession;
+  }
+
+  // TODO: Maybe use this? https://developer.android.com/topic/libraries/app-startup
+  public Matrix initMatrix() {
+    MatrixConfiguration configuration = new MatrixConfiguration(
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      true,
+      null,
+      new RoomDisplayNameFallbackProviderImpl(),
+      true,
+      null,
+      null,
+      null,
+      null
+    );
+
+    matrix = new Matrix(ctx, configuration);
+
+    return matrix;
+  }
 }
