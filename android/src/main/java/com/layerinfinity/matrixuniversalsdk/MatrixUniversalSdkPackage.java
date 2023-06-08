@@ -29,16 +29,16 @@ public class MatrixUniversalSdkPackage extends TurboReactPackage {
       final Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
       boolean isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
       moduleInfos.put(
-              MatrixUniversalSdkModule.NAME,
-              new ReactModuleInfo(
-                      MatrixUniversalSdkModule.NAME,
-                      MatrixUniversalSdkModule.NAME,
-                      false, // canOverrideExistingModule
-                      false, // needsEagerInit
-                      true, // hasConstants
-                      false, // isCxxModule
-                      isTurboModule // isTurboModule
-      ));
+        MatrixUniversalSdkModule.NAME,
+        new ReactModuleInfo(
+          MatrixUniversalSdkModule.NAME,
+          MatrixUniversalSdkModule.NAME,
+          false, // canOverrideExistingModule
+          false, // needsEagerInit
+          true, // hasConstants
+          false, // isCxxModule
+          isTurboModule // isTurboModule
+        ));
       return moduleInfos;
     };
   }
