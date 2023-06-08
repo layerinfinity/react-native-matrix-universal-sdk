@@ -28,3 +28,7 @@ const MatrixUniversalSdk = MatrixUniversalSdkModule
 export function createClient(params: HomeServerConfigType): Promise<void> {
   return MatrixUniversalSdk.createClient(params);
 }
+
+export function loginWithToken(token: string): Promise<void> {
+  return MatrixUniversalSdk.loginWithToken(token);
+}
