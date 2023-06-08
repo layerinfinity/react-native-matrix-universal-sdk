@@ -5,17 +5,17 @@ React Native SDK for Matrix.org
 ## Installation
 
 ```sh
-npm install @layerinfinity/react-native-matrix-universal-sdk
+npm install @layerinfinity/react-native-matrix-universal-sdk --save-exact
 ```
 
 ## Usage
 
 ```js
-import { multiply } from '@layerinfinity/react-native-matrix-universal-sdk';
+import { createClient } from '@layerinfinity/react-native-matrix-universal-sdk';
 
 // ...
 
-const result = await multiply(3, 7);
+await createClient({ baseUrl: 'https://matrix.tauhu.cloud' });
 ```
 
 ## Contributing
@@ -27,5 +27,3 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 MIT
 
 ---
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
