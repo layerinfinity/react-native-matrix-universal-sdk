@@ -1,0 +1,98 @@
+package com.layerinfinity.matrixuniversalsdk
+
+import android.net.Uri
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
+import com.layerinfinity.matrixuniversalsdk.key.AuthenticationKey
+import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey
+import kotlinx.coroutines.launch
+import org.matrix.android.sdk.api.Matrix
+import org.matrix.android.sdk.api.MatrixConfiguration
+import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
+import org.matrix.android.sdk.api.session.Session
+
+class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationContext) :
+  ReactContextBaseJavaModule(
+    ctx
+  ) {
+  private lateinit var matrix: Matrix
+
+
+  override fun getName(): String {
+    return NAME
+  }
+
+  // Don't forget to open the session and start syncing.
+  val lastSession: Session?
+    get() {
+      val lastSession = matrix.authenticationService().getLastAuthenticatedSession()
+      if (lastSession != null) {
+        SessionHolder.currentSession = lastSession
+        // Don't forget to open the session and start syncing.
+        lastSession.open()
+        lastSession.syncService().startSync(true)
+      }
+      return lastSession
+    }
+
+  // TODO: Maybe use this? https://developer.android.com/topic/libraries/app-startup
+  // Must be used first
+  @ReactMethod
+  fun createClient(params: ReadableMap?) {
+    try {
+      val configuration = MatrixConfiguration(
+        roomDisplayNameFallbackProvider = RoomDisplayNameFallbackProviderImpl()
+      )
+      matrix = Matrix(ctx, configuration)
+    } catch (e: Exception) {
+      // Catch here
+    }
+  }
+
+  @ReactMethod
+  fun login(params: ReadableMap) {
+    // Try this.
+    val homeServerUri = params.getString(HomeServerKey.HOME_SERVER_URL)
+    val username = params.getString(AuthenticationKey.USERNAME_KEY)!!.trim()
+    val password = params.getString(AuthenticationKey.PASSWORD_KEY)!!.trim()
+    val homeServerConnectionConfig = try {
+      HomeServerConnectionConfig
+        .Builder()
+        .withHomeServerUri(Uri.parse(homeServerUri))
+        .build()
+    } catch (failure: Throwable) {
+      return
+    }
+
+    (ctx.currentActivity as AppCompatActivity).lifecycleScope.launch {
+      try {
+        matrix.authenticationService().directAuthentication(
+          homeServerConnectionConfig,
+          username,
+          password,
+          "chatgm-matrix",
+        )
+      } catch (failure: Throwable) {
+        Toast.makeText(ctx, "Failure: $failure", Toast.LENGTH_SHORT).show()
+        null
+      }?.let { session ->
+        SessionHolder.currentSession = session
+        session.open()
+        session.syncService().startSync(true)
+      }
+    }
+  }
+
+  companion object {
+    const val NAME = "MatrixUniversalSdk"
+    val TAG = MatrixUniversalSdkModule::class.java.simpleName
+    const val E_MATRIX_ERROR = "E_MATRIX_ERROR"
+    const val E_NETWORK_ERROR = "E_NETWORK_ERROR"
+    const val E_UNEXCPECTED_ERROR = "E_UNKNOWN_ERROR"
+  }
+}
