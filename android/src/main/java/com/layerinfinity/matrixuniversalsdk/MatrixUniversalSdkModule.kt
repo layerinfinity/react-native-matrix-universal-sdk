@@ -4,6 +4,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -15,6 +16,9 @@ import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.MatrixConfiguration
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
 import org.matrix.android.sdk.api.session.Session
+import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams
+import org.matrix.android.sdk.api.session.room.model.Membership
+import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
 
 class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationContext) :
   ReactContextBaseJavaModule(
@@ -43,7 +47,7 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
   // TODO: Maybe use this? https://developer.android.com/topic/libraries/app-startup
   // Must be used first
   @ReactMethod
-  fun createClient(params: ReadableMap?) {
+  fun createClient(params: ReadableMap) {
     try {
       val configuration = MatrixConfiguration(
         roomDisplayNameFallbackProvider = RoomDisplayNameFallbackProviderImpl()
@@ -86,6 +90,21 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
         session.syncService().startSync(true)
       }
     }
+  }
+
+  @ReactMethod
+  fun getRoom(roomId: String) {
+    SessionHolder.currentSession?.roomService()?.getRoom(roomId)
+  }
+
+  fun getRooms(promise: Promise) {
+    val roomSummariesQuery = roomSummaryQueryParams {
+      memberships = Membership.activeMemberships()
+    }
+
+    SessionHolder.currentSession?.roomService()?.getRoomSummaries(
+      roomSummariesQuery
+    )
   }
 
   companion object {
