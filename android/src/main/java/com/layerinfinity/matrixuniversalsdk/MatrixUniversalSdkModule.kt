@@ -19,9 +19,11 @@ import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.MatrixConfiguration
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
 import org.matrix.android.sdk.api.session.Session
+import org.matrix.android.sdk.api.session.events.model.toModel
 import org.matrix.android.sdk.api.session.room.RoomSortOrder
 import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams
 import org.matrix.android.sdk.api.session.room.model.Membership
+import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
 
 class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationContext) :
@@ -100,10 +102,14 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
   fun getRoom(roomId: String, promise: Promise) {
     val room = SessionHolder.currentSession?.roomService()?.getRoom(roomId)
     if (room !== null) {
+      val messageContent = room.roomSummary()?.latestPreviewableEvent?.root?.getClearContent()
+        .toModel<MessageContent>()
+      val lastMsgContent = messageContent?.body ?: ""
+
       val params = Arguments.createMap().apply {
         putString(RoomKey.ROOM_ID, room.roomId)
-        putString(RoomKey.MY_USER_ID, "TODO")
-        putString(RoomKey.MY_USER_ID, room.roomSummary()?.displayName)
+        putString(RoomKey.DISPLAY_NAME, room.roomSummary()?.displayName)
+        putString(RoomKey.LAST_MESSAGE, lastMsgContent)
       }
     }
   }
