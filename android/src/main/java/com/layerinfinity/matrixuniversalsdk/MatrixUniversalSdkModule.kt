@@ -4,18 +4,22 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.WritableMap
 import com.layerinfinity.matrixuniversalsdk.key.AuthenticationKey
 import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey
+import com.layerinfinity.matrixuniversalsdk.key.RoomKey
 import kotlinx.coroutines.launch
 import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.MatrixConfiguration
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
 import org.matrix.android.sdk.api.session.Session
+import org.matrix.android.sdk.api.session.room.RoomSortOrder
 import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams
 import org.matrix.android.sdk.api.session.room.model.Membership
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
@@ -93,18 +97,35 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
   }
 
   @ReactMethod
-  fun getRoom(roomId: String) {
-    SessionHolder.currentSession?.roomService()?.getRoom(roomId)
+  fun getRoom(roomId: String, promise: Promise) {
+    val room = SessionHolder.currentSession?.roomService()?.getRoom(roomId)
+    if (room !== null) {
+      val params = Arguments.createMap().apply {
+        putString(RoomKey.ROOM_ID, room.roomId)
+        putString(RoomKey.MY_USER_ID, "TODO")
+        putString(RoomKey.MY_USER_ID, room.roomSummary()?.displayName)
+      }
+    }
   }
 
   fun getRooms(promise: Promise) {
     val roomSummariesQuery = roomSummaryQueryParams {
       memberships = Membership.activeMemberships()
     }
+    val defaultRoomSortOrder = RoomSortOrder.ACTIVITY
 
-    SessionHolder.currentSession?.roomService()?.getRoomSummaries(
-      roomSummariesQuery
+    val rooms = SessionHolder.currentSession?.roomService()?.getRoomSummaries(
+      roomSummariesQuery,
+      defaultRoomSortOrder
     )
+
+    if (rooms !== null) {
+      val params = Arguments.createMap().apply {
+        putString("id", "aa")
+      }
+      promise.resolve(params)
+
+    }
   }
 
   companion object {
