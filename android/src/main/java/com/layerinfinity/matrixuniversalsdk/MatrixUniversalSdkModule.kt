@@ -128,9 +128,17 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
     )
 
     if (rooms !== null) {
-      rooms.map
-      val throwback = Arguments.createArray().apply {
-//        putString("id", "aa")
+      val throwback = rooms.map { it ->
+        Arguments.createMap().apply {
+          val messageContent = it.latestPreviewableEvent?.root?.getClearContent()
+            .toModel<MessageContent>()
+          val lastMsgContent = messageContent?.body ?: ""
+
+
+          putString(RoomKey.ROOM_ID, it.roomId)
+          putString(RoomKey.DISPLAY_NAME, it.displayName)
+          putString(RoomKey.LAST_MESSAGE, lastMsgContent)
+        }
       }
       promise.resolve(throwback)
     }
