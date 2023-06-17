@@ -1,6 +1,6 @@
 package com.layerinfinity.matrixuniversalsdk.key
 
 object AuthenticationKey {
-    var USERNAME_KEY = "username"
-    var PASSWORD_KEY = "password"
+  val USERNAME_KEY = "username"
+  val PASSWORD_KEY = "password"
 }

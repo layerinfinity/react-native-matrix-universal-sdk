@@ -1,5 +1,16 @@
 export type HomeServerConfigType = {
-  baseUrl: string;
+  homeServerUrl: string;
   deviceId: string;
   accessToken: string;
+};
+
+export type LoginParamsType = {
+  username: string;
+  password: string;
+};
+
+export type RoomType = {
+  roomId: string;
+  displayName: string;
+  lastMessage: string;
 };

@@ -10,7 +10,6 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableMap
 import com.layerinfinity.matrixuniversalsdk.key.AuthenticationKey
 import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey
 import com.layerinfinity.matrixuniversalsdk.key.RoomKey
@@ -21,7 +20,6 @@ import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
 import org.matrix.android.sdk.api.session.Session
 import org.matrix.android.sdk.api.session.events.model.toModel
 import org.matrix.android.sdk.api.session.room.RoomSortOrder
-import org.matrix.android.sdk.api.session.room.RoomSummaryQueryParams
 import org.matrix.android.sdk.api.session.room.model.Membership
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
@@ -64,8 +62,9 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
     }
   }
 
+  // Use this to login
   @ReactMethod
-  fun login(params: ReadableMap) {
+  fun login(params: ReadableMap, promise: Promise) {
     // Try this.
     val homeServerUri = params.getString(HomeServerKey.HOME_SERVER_URL)
     val username = params.getString(AuthenticationKey.USERNAME_KEY)!!.trim()
@@ -88,12 +87,14 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
           "chatgm-matrix",
         )
       } catch (failure: Throwable) {
+        promise.resolve(false)
         Toast.makeText(ctx, "Failure: $failure", Toast.LENGTH_SHORT).show()
         null
       }?.let { session ->
         SessionHolder.currentSession = session
         session.open()
         session.syncService().startSync(true)
+        promise.resolve(true)
       }
     }
   }
