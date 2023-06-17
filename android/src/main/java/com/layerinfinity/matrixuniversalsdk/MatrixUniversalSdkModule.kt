@@ -116,6 +116,7 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
     }
   }
 
+  @ReactMethod
   fun getRooms(promise: Promise) {
     val roomSummariesQuery = roomSummaryQueryParams {
       memberships = Membership.activeMemberships()
@@ -133,14 +134,14 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
           val messageContent = it.latestPreviewableEvent?.root?.getClearContent()
             .toModel<MessageContent>()
           val lastMsgContent = messageContent?.body ?: ""
-
-
           putString(RoomKey.ROOM_ID, it.roomId)
           putString(RoomKey.DISPLAY_NAME, it.displayName)
           putString(RoomKey.LAST_MESSAGE, lastMsgContent)
         }
       }
       promise.resolve(throwback)
+    } else {
+      promise.reject(Error("Room object is null"))
     }
   }
 
