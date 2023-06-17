@@ -106,11 +106,13 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
         .toModel<MessageContent>()
       val lastMsgContent = messageContent?.body ?: ""
 
-      val params = Arguments.createMap().apply {
+      val throwback = Arguments.createMap().apply {
         putString(RoomKey.ROOM_ID, room.roomId)
         putString(RoomKey.DISPLAY_NAME, room.roomSummary()?.displayName)
         putString(RoomKey.LAST_MESSAGE, lastMsgContent)
       }
+
+      promise.resolve(throwback)
     }
   }
 
@@ -126,11 +128,11 @@ class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationCon
     )
 
     if (rooms !== null) {
-      val params = Arguments.createMap().apply {
-        putString("id", "aa")
+      rooms.map
+      val throwback = Arguments.createArray().apply {
+//        putString("id", "aa")
       }
-      promise.resolve(params)
-
+      promise.resolve(throwback)
     }
   }
 
