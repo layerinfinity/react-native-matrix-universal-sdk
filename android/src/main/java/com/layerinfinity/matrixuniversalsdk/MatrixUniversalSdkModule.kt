@@ -54,14 +54,16 @@ class MatrixUniversalSdkModule internal constructor(
   // TODO: Maybe use this? https://developer.android.com/topic/libraries/app-startup
   // Must be used first
   @ReactMethod
-  fun createClient(params: ReadableMap) {
+  fun createClient(params: ReadableMap, promise: Promise) {
     try {
       val configuration = MatrixConfiguration(
         roomDisplayNameFallbackProvider = RoomDisplayNameFallbackProviderImpl()
       )
       matrix = Matrix(ctx, configuration)
+      promise.resolve(true)
     } catch (e: Exception) {
       // Catch here
+      promise.reject(Error(e))
     }
   }
 

@@ -1,7 +1,7 @@
 export type HomeServerConfigType = {
   homeServerUrl: string;
-  deviceId: string;
-  accessToken: string;
+  deviceId?: string;
+  accessToken?: string;
 };
 
 export type LoginParamsType = {

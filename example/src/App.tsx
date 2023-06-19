@@ -1,14 +1,23 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text, NativeModules } from 'react-native';
-console.log('NativeModules', JSON.stringify(NativeModules));
+import { StyleSheet, View, Text, Button } from 'react-native';
+import { createClient } from '../../';
 
 export default function App() {
   const [result] = React.useState<number | undefined>();
 
+  async function login() {
+    const resp = await createClient({
+      homeServerUrl: 'https://matrix.tauhu.cloud/',
+    });
+    console.log(resp);
+  }
+
   return (
     <View style={styles.container}>
       <Text>Result: {result}</Text>
+
+      <Button title="Log" onPress={login} />
     </View>
   );
 }
