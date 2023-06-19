@@ -3,27 +3,27 @@ package com.layerinfinity.matrixuniversalsdk
 import org.matrix.android.sdk.api.provider.RoomDisplayNameFallbackProvider
 
 class RoomDisplayNameFallbackProviderImpl : RoomDisplayNameFallbackProvider {
-    override fun getNameFor1member(s: String): String {
-        return s
+    override fun getNameFor1member(name: String): String {
+        return name
     }
 
     override fun getNameFor2members(name1: String, name2: String): String {
         return String.format("%s and %s.", name1, name2)
     }
 
-    override fun getNameFor3members(s: String, s1: String, s2: String): String {
-        return String.format("%s and %s and %s.", s, s1, s2)
+    override fun getNameFor3members(name1: String, name2: String, name3: String): String {
+        return String.format("%s and %s and %s.", name1, name2, name3)
     }
 
-    override fun getNameFor4members(s: String, s1: String, s2: String, s3: String): String {
-        return String.format("%s, %s, %s and %s.", s, s1, s2, s3)
+    override fun getNameFor4members(name1: String, name2: String, name3: String, name4: String): String {
+        return String.format("%s, %s, %s and %s.", name1, name2, name3, name4)
     }
 
-    override fun getNameFor4membersAndMore(s: String, s1: String, s2: String, i: Int): String {
-        return String.format("%s, %s, %s and %s others", s, s1, s2, i)
+    override fun getNameFor4membersAndMore(name1: String, name2: String, name3: String, remainingCount: Int): String {
+        return String.format("%s, %s, %s and %s others", name1, name2, name3, remainingCount)
     }
 
-    override fun getNameForEmptyRoom(b: Boolean, list: List<String>): String {
+    override fun getNameForEmptyRoom(isDirect: Boolean, leftMemberNames: List<String>): String {
         return "Empty room"
     }
 
