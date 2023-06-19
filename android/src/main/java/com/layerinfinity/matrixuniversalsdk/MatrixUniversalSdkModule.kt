@@ -59,7 +59,9 @@ class MatrixUniversalSdkModule internal constructor(
       val configuration = MatrixConfiguration(
         roomDisplayNameFallbackProvider = RoomDisplayNameFallbackProviderImpl()
       )
-      matrix = Matrix(ctx, configuration)
+      if (!this::matrix.isInitialized) {
+        matrix = Matrix(ctx, configuration)
+      }
       promise.resolve(true)
     } catch (e: Exception) {
       // Catch here
