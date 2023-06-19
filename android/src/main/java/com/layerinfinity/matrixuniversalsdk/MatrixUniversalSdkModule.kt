@@ -24,12 +24,15 @@ import org.matrix.android.sdk.api.session.room.model.Membership
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
 
-class MatrixUniversalSdkModule internal constructor(var ctx: ReactApplicationContext) :
+class MatrixUniversalSdkModule internal constructor(
+  private val ctx: ReactApplicationContext,
+  private val eventEmitter: RNEventEmitter,
+  private val matrixTimelineObservers: MatrixTimelineObservers
+) :
   ReactContextBaseJavaModule(
     ctx
   ) {
   private lateinit var matrix: Matrix
-
 
   override fun getName(): String {
     return NAME
