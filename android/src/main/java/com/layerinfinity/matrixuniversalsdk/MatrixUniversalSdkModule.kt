@@ -82,6 +82,7 @@ class MatrixUniversalSdkModule internal constructor(
         .withHomeServerUri(Uri.parse(homeServerUri))
         .build()
     } catch (failure: Throwable) {
+      promise.reject(Error(failure))
       return
     }
 
@@ -94,14 +95,14 @@ class MatrixUniversalSdkModule internal constructor(
           "chatgm-matrix",
         )
       } catch (failure: Throwable) {
-        promise.resolve(false)
+        promise.reject(Error(failure))
         Toast.makeText(ctx, "Failure: $failure", Toast.LENGTH_SHORT).show()
         null
       }?.let { session ->
         SessionHolder.currentSession = session
         session.open()
         session.syncService().startSync(true)
-        promise.resolve(true)
+        promise.resolve("connected")
       }
     }
   }

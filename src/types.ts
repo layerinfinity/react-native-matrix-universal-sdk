@@ -5,6 +5,7 @@ export type HomeServerConfigType = {
 };
 
 export type LoginParamsType = {
+  homeServerUrl: string;
   username: string;
   password: string;
 };

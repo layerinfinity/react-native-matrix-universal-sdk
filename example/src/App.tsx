@@ -15,6 +15,7 @@ export default function App() {
 
   async function loginWithPw() {
     const resp = await login({
+      homeServerUrl: 'https://matrix.tauhu.cloud/',
       username: 'gm.doko',
       password: 'test123456',
     });
