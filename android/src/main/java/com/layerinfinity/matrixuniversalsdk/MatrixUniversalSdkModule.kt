@@ -10,6 +10,7 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.WritableArray
 import com.layerinfinity.matrixuniversalsdk.key.AuthenticationKey
 import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey
 import com.layerinfinity.matrixuniversalsdk.key.RoomKey
@@ -54,7 +55,7 @@ class MatrixUniversalSdkModule internal constructor(
   // TODO: Maybe use this? https://developer.android.com/topic/libraries/app-startup
   // Must be used first
   @ReactMethod
-  fun createClient(params: ReadableMap, promise: Promise) {
+  fun createClient(url: String, promise: Promise) {
     try {
       val configuration = MatrixConfiguration(
         roomDisplayNameFallbackProvider = RoomDisplayNameFallbackProviderImpl()
@@ -152,6 +153,10 @@ class MatrixUniversalSdkModule internal constructor(
     } else {
       promise.reject(Error("Room object is null"))
     }
+  }
+
+  fun createRoom(roomName: String, participants: WritableArray) {
+
   }
 
   companion object {
