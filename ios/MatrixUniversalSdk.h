@@ -4,30 +4,28 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
-#import "MatrixUniversalSdk.h"
+#import <Foundation/Foundation.h>
+#import <React/RCTEventEmitter.h>
 
+// Keys
+#define kHomeServerUrl @"homeServerUrl"
+#define kDeviceId @"deviceId"
+#define kAccessToken @"accessToken"
 
-// Will expose a RN_MatrixSdk native module to JS
-@interface RCT_EXTERN_REMAP_MODULE(RN_MatrixSdk, MatrixUniversalSdk, NSObject)
+// Room keys
+#define kRoomId @"roomId"
+#define kMyUserId @"myUserId"
+#define kDisplayName @"displayName"
+#define kLastMessage @"lastMessage"
 
-+ (BOOL)requiresMainQueueSetup
-{
-    return false;
-}
+// Authentication keys
+#define kUsername @"username"
+#define kPassword @"password"
 
-RCT_EXTERN_METHOD(supportedEvents)
+// Error keys
+#define kErrorNotInitialized @"not_initialized"
+#define kErrorRoomNotFound @"room_not_found"
 
-RCT_EXTERN_METHOD(constantsToExport)
+@interface MatrixUniversalSdk : RCTEventEmitter <RCTBridgeModule>
 
-RCT_EXTERN_METHOD(setAdditionalEventTypes:(NSArray *)types)
-
-RCT_EXTERN_METHOD(createClient:(NSString *)url)
-
-RCT_EXTERN_METHOD(setCredentials:(nonnull NSString *)accessToken deviceId:(nonnull NSString *)deviceId userId:(nonnull NSString *)userId homeServer:(nonnull NSString *)homeServer refreshToken:(NSString *)refreshToken)
-
-RCT_EXTERN_METHOD(login:(nonnull NSString *)username password:(nonnull NSString *)password resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(startSession:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(createRoom:(NSArray *)userIds isDirect:(nonnull BOOL *)isDirect isTrustedPrivateChat:(nonnull BOOL *)isTrustedPrivateChat name:(NSString *)name resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 @end

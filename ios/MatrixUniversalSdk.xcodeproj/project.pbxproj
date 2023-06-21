@@ -6,10 +6,6 @@
 	objectVersion = 46;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		EDC4B37D2A0509AD00A4B0AD /* MatrixUniversalSdk.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXCopyFilesBuildPhase section */
 		58B511D91A9E6C8500147676 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -29,7 +25,6 @@
 		ED81E1922A08DD310008C108 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		ED81E1932A08DD310008C108 /* Utilities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utilities.m; sourceTree = "<group>"; };
 		EDC4B37B2A0509AC00A4B0AD /* MatrixUniversalSdk-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MatrixUniversalSdk-Bridging-Header.h"; sourceTree = "<group>"; };
-		EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixUniversalSdk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +51,6 @@
 			children = (
 				ED81E1922A08DD310008C108 /* Utilities.h */,
 				ED81E1932A08DD310008C108 /* Utilities.m */,
-				EDC4B37C2A0509AD00A4B0AD /* MatrixUniversalSdk.swift */,
 				ED13C4BB2A42EA5200A96923 /* MatrixUniversalSdk.m */,
 				B3E7B5881CC2AC0600A0062D /* MatrixUniversalSdk.h */,
 				EDC4B37B2A0509AC00A4B0AD /* MatrixUniversalSdk-Bridging-Header.h */,
@@ -122,7 +116,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EDC4B37D2A0509AD00A4B0AD /* MatrixUniversalSdk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
