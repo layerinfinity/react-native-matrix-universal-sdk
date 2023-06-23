@@ -20,7 +20,12 @@ import kotlinx.coroutines.launch
 import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.MatrixConfiguration
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
+import org.matrix.android.sdk.api.failure.GlobalError
+import org.matrix.android.sdk.api.listeners.ProgressListener
+import org.matrix.android.sdk.api.session.LiveEventListener
 import org.matrix.android.sdk.api.session.Session
+import org.matrix.android.sdk.api.session.crypto.verification.VerificationService
+import org.matrix.android.sdk.api.session.events.model.Event
 import org.matrix.android.sdk.api.session.events.model.toContent
 import org.matrix.android.sdk.api.session.events.model.toModel
 import org.matrix.android.sdk.api.session.room.RoomSortOrder
@@ -29,6 +34,8 @@ import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams
 import org.matrix.android.sdk.api.session.room.model.create.CreateRoomPreset
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
+import org.matrix.android.sdk.api.session.statistics.StatisticEvent
+import org.matrix.android.sdk.api.util.JsonDict
 
 class MatrixUniversalSdkModule internal constructor(
   private val ctx: ReactApplicationContext,
@@ -37,7 +44,7 @@ class MatrixUniversalSdkModule internal constructor(
 ) :
   ReactContextBaseJavaModule(
     ctx
-  ) {
+  ), ProgressListener, VerificationService.Listener, Session.Listener {
   private lateinit var matrix: Matrix
 
   override fun getName(): String {
@@ -107,6 +114,8 @@ class MatrixUniversalSdkModule internal constructor(
         SessionHolder.currentSession = session
         session.open()
         session.syncService().startSync(true)
+        session.addListener(this@MatrixUniversalSdkModule)
+
         promise.resolve("connected")
       }
     }
@@ -138,37 +147,27 @@ class MatrixUniversalSdkModule internal constructor(
       memberships = Membership.activeMemberships()
     }
     val defaultRoomSortOrder = RoomSortOrder.ACTIVITY
-//    val rooms = SessionHolder.currentSession!!.roomService().getRoomSummaries(
-//      roomSummariesQuery,
-//      defaultRoomSortOrder
-//    )
 
-    (ctx).runOnUiQueueThread {
-      val rooms = SessionHolder.currentSession!!.roomService().getRoomSummariesLive(
-        roomSummariesQuery
-      ).observe(ctx as LifecycleOwner) {
-        if (it !== null) {
-          val throwback = it.map { singleItem ->
-            Arguments.createMap().apply {
-              val messageContent = singleItem.latestPreviewableEvent?.root?.getClearContent()
-                .toModel<MessageContent>()
-              val lastMsgContent = messageContent?.body ?: ""
-              val senderId = singleItem.latestPreviewableEvent?.root?.senderId ?: "";
+    val rooms = SessionHolder.currentSession!!.roomService().getRoomSummaries(
+      roomSummariesQuery,
+      defaultRoomSortOrder
+    )
 
-              putString(RoomKey.ROOM_ID, singleItem.roomId)
-              putString(RoomKey.DISPLAY_NAME, singleItem.displayName)
-              putString(RoomKey.LAST_MESSAGE, lastMsgContent)
-            }
-          }
-          Log.v(TAG, "gogogo=" + it.size.toString());
+    val throwback = rooms.map { singleItem ->
+      Arguments.createMap().apply {
+        val messageContent = singleItem.latestPreviewableEvent?.root?.getClearContent()
+          .toModel<MessageContent>()
+        val lastMsgContent = messageContent?.body ?: ""
+        val senderId = singleItem.latestPreviewableEvent?.root?.senderId ?: "";
 
-          promise.resolve(throwback)
-        } else {
-          promise.reject(Error("Room object is null"))
-        }
+        putString(RoomKey.ROOM_ID, singleItem.roomId)
+        putString(RoomKey.DISPLAY_NAME, singleItem.displayName)
+        putString(RoomKey.LAST_MESSAGE, lastMsgContent)
       }
     }
+    Log.v(TAG, "gogogo=" + rooms.size.toString());
 
+//    promise.resolve(throwback)
   }
 
   @ReactMethod
@@ -191,6 +190,31 @@ class MatrixUniversalSdkModule internal constructor(
         // Code...
       }
     }
+  }
+
+
+  override fun onProgress(progress: Int, total: Int) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onGlobalError(session: Session, globalError: GlobalError) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onNewInvitedRoom(session: Session, roomId: String) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onClearCache(session: Session) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onSessionStarted(session: Session) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onSessionStopped(session: Session) {
+    Log.d("HEHEEH", "HIHI")
   }
 
   companion object {
