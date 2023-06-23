@@ -9,8 +9,8 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableArray
 import com.layerinfinity.matrixuniversalsdk.key.AuthenticationKey
 import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey
 import com.layerinfinity.matrixuniversalsdk.key.RoomKey
@@ -19,9 +19,12 @@ import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.MatrixConfiguration
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
 import org.matrix.android.sdk.api.session.Session
+import org.matrix.android.sdk.api.session.events.model.toContent
 import org.matrix.android.sdk.api.session.events.model.toModel
 import org.matrix.android.sdk.api.session.room.RoomSortOrder
 import org.matrix.android.sdk.api.session.room.model.Membership
+import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams
+import org.matrix.android.sdk.api.session.room.model.create.CreateRoomPreset
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
 
@@ -114,12 +117,14 @@ class MatrixUniversalSdkModule internal constructor(
     if (room !== null) {
       val messageContent = room.roomSummary()?.latestPreviewableEvent?.root?.getClearContent()
         .toModel<MessageContent>()
-      val lastMsgContent = messageContent?.body ?: ""
+      val lastMsgContent = messageContent?.body ?: "";
 
       val throwback = Arguments.createMap().apply {
         putString(RoomKey.ROOM_ID, room.roomId)
         putString(RoomKey.DISPLAY_NAME, room.roomSummary()?.displayName)
         putString(RoomKey.LAST_MESSAGE, lastMsgContent)
+
+//        val content = room.roomSummary()?.directUserPresence.toContent()
       }
 
       promise.resolve(throwback)
@@ -144,6 +149,8 @@ class MatrixUniversalSdkModule internal constructor(
           val messageContent = it.latestPreviewableEvent?.root?.getClearContent()
             .toModel<MessageContent>()
           val lastMsgContent = messageContent?.body ?: ""
+          val senderId = it.latestPreviewableEvent?.root?.senderId ?: "";
+
           putString(RoomKey.ROOM_ID, it.roomId)
           putString(RoomKey.DISPLAY_NAME, it.displayName)
           putString(RoomKey.LAST_MESSAGE, lastMsgContent)
@@ -155,8 +162,26 @@ class MatrixUniversalSdkModule internal constructor(
     }
   }
 
-  fun createRoom(roomName: String, participants: WritableArray) {
+  @ReactMethod
+  fun createRoom(roomName: String, participants: ReadableArray) {
+    val createRoomParams = CreateRoomParams()
+    createRoomParams.name = roomName
+    createRoomParams.preset = CreateRoomPreset.PRESET_TRUSTED_PRIVATE_CHAT
+    createRoomParams.isDirect = true
 
+
+    val arr: MutableList<String> = mutableListOf()
+    for (i in 0 until participants.size()) {
+      arr.add(participants.getString(i))
+    }
+    createRoomParams.invitedUserIds = arr
+    (ctx.currentActivity as AppCompatActivity).lifecycleScope.launch {
+      try {
+        SessionHolder.currentSession?.roomService()?.createRoom(createRoomParams)
+      } catch (failure: Throwable) {
+        // Code...
+      }
+    }
   }
 
   companion object {

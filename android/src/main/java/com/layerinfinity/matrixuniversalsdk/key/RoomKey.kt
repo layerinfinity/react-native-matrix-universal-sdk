@@ -6,4 +6,5 @@ object RoomKey {
   val MY_USER_ID = "myUserId"
   val DISPLAY_NAME = "displayName"
   val LAST_MESSAGE = "lastMessage"
+  val WITH_USER = "withUser"
 }
