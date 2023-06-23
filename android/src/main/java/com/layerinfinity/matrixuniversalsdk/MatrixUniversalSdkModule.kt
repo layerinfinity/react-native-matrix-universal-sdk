@@ -1,8 +1,10 @@
 package com.layerinfinity.matrixuniversalsdk
 
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
@@ -42,7 +44,6 @@ class MatrixUniversalSdkModule internal constructor(
     return NAME
   }
 
-  // Don't forget to open the session and start syncing.
   val lastSession: Session?
     get() {
       val lastSession = matrix.authenticationService().getLastAuthenticatedSession()
@@ -113,7 +114,7 @@ class MatrixUniversalSdkModule internal constructor(
 
   @ReactMethod
   fun getRoom(roomId: String, promise: Promise) {
-    val room = SessionHolder.currentSession?.roomService()?.getRoom(roomId)
+    val room = SessionHolder.currentSession!!.roomService().getRoom(roomId)
     if (room !== null) {
       val messageContent = room.roomSummary()?.latestPreviewableEvent?.root?.getClearContent()
         .toModel<MessageContent>()
@@ -124,7 +125,7 @@ class MatrixUniversalSdkModule internal constructor(
         putString(RoomKey.DISPLAY_NAME, room.roomSummary()?.displayName)
         putString(RoomKey.LAST_MESSAGE, lastMsgContent)
 
-//        val content = room.roomSummary()?.directUserPresence.toContent()
+        val content = room.roomSummary()?.directUserPresence
       }
 
       promise.resolve(throwback)
@@ -137,29 +138,37 @@ class MatrixUniversalSdkModule internal constructor(
       memberships = Membership.activeMemberships()
     }
     val defaultRoomSortOrder = RoomSortOrder.ACTIVITY
+//    val rooms = SessionHolder.currentSession!!.roomService().getRoomSummaries(
+//      roomSummariesQuery,
+//      defaultRoomSortOrder
+//    )
 
-    val rooms = SessionHolder.currentSession?.roomService()?.getRoomSummaries(
-      roomSummariesQuery,
-      defaultRoomSortOrder
-    )
+    (ctx).runOnUiQueueThread {
+      val rooms = SessionHolder.currentSession!!.roomService().getRoomSummariesLive(
+        roomSummariesQuery
+      ).observe(ctx as LifecycleOwner) {
+        if (it !== null) {
+          val throwback = it.map { singleItem ->
+            Arguments.createMap().apply {
+              val messageContent = singleItem.latestPreviewableEvent?.root?.getClearContent()
+                .toModel<MessageContent>()
+              val lastMsgContent = messageContent?.body ?: ""
+              val senderId = singleItem.latestPreviewableEvent?.root?.senderId ?: "";
 
-    if (rooms !== null) {
-      val throwback = rooms.map { it ->
-        Arguments.createMap().apply {
-          val messageContent = it.latestPreviewableEvent?.root?.getClearContent()
-            .toModel<MessageContent>()
-          val lastMsgContent = messageContent?.body ?: ""
-          val senderId = it.latestPreviewableEvent?.root?.senderId ?: "";
+              putString(RoomKey.ROOM_ID, singleItem.roomId)
+              putString(RoomKey.DISPLAY_NAME, singleItem.displayName)
+              putString(RoomKey.LAST_MESSAGE, lastMsgContent)
+            }
+          }
+          Log.v(TAG, "gogogo=" + it.size.toString());
 
-          putString(RoomKey.ROOM_ID, it.roomId)
-          putString(RoomKey.DISPLAY_NAME, it.displayName)
-          putString(RoomKey.LAST_MESSAGE, lastMsgContent)
+          promise.resolve(throwback)
+        } else {
+          promise.reject(Error("Room object is null"))
         }
       }
-      promise.resolve(throwback)
-    } else {
-      promise.reject(Error("Room object is null"))
     }
+
   }
 
   @ReactMethod
@@ -177,7 +186,7 @@ class MatrixUniversalSdkModule internal constructor(
     createRoomParams.invitedUserIds = arr
     (ctx.currentActivity as AppCompatActivity).lifecycleScope.launch {
       try {
-        SessionHolder.currentSession?.roomService()?.createRoom(createRoomParams)
+        SessionHolder.currentSession!!.roomService().createRoom(createRoomParams)
       } catch (failure: Throwable) {
         // Code...
       }
