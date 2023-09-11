@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text, Button, NativeModules } from 'react-native';
-import { createClient, loginWithJwt } from '../../';
+import { createClient, loginWithJwt, getRooms } from '../../';
 
 export default function App() {
   const [result] = React.useState<number | undefined>();
@@ -19,6 +19,11 @@ export default function App() {
     console.log(resp);
   }
 
+  async function getRoomsRN() {
+    const resp = await getRooms();
+    console.log(resp);
+  }
+
   return (
     <View style={styles.container}>
       <Text>Result: {result}</Text>
@@ -27,15 +32,17 @@ export default function App() {
         title="Check Native Modules"
         onPress={() => {
           console.log(
-            NativeModules.RN_MatrixSdk,
+            // NativeModules.RN_MatrixSdk,
             NativeModules.MatrixUniversalSdk
           );
         }}
       />
 
-      <Button title="Log" onPress={loggg} />
+      <Button title="Create Client (run first)" onPress={loggg} />
 
-      <Button title="Log2" onPress={loginWithPw} />
+      <Button title="Login with PW" onPress={loginWithPw} />
+
+      <Button title="Get Rooms" onPress={getRoomsRN} />
     </View>
   );
 }

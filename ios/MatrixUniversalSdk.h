@@ -25,6 +25,8 @@
 // Error keys
 #define kErrorNotInitialized @"not_initialized"
 #define kErrorRoomNotFound @"room_not_found"
+#define kAuthenticationFailed @"authentication_failed"
+
 
 @interface MatrixUniversalSdk : RCTEventEmitter <RCTBridgeModule>
 

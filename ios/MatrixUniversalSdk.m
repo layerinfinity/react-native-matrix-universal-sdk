@@ -8,6 +8,7 @@
 {
     MXRestClient *mxRestClient;
     MXSession *mxSession;
+    MXCredentials *mxCredentials;
 }
 
 static NSUUID * _uuid;
@@ -20,6 +21,49 @@ RCT_EXPORT_MODULE();
         kHomeServerUrl,
         kDeviceId,
         kAccessToken,
+    ];
+}
+
+// TODO
+RCT_EXPORT_METHOD(createClient:(NSString *) url
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if (mxSession == nil) {
+        reject(kErrorNotInitialized, @"MXSession not initialized", nil);
+    }
+}
+
+// TODO
+RCT_EXPORT_METHOD(login:(NSDictionary *) params
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if (mxSession == nil) {
+        reject(kErrorNotInitialized, @"MXSession not initialized", nil);
+    }
+    
+    NSString *homeServerUrl = params[kHomeServerUrl];
+    
+    mxCredentials = [[MXCredentials alloc]
+                     initWithHomeServer:homeServerUrl
+                     userId:nil
+                     accessToken:nil];
+    
+    mxRestClient = [[MXRestClient alloc]
+                    initWithHomeServer:homeServerUrl
+                    andOnUnrecognizedCertificateBlock:^BOOL(NSData *certificate) {
+        // TODO: Reject properly
+        return NO;
+    }];
+    
+    mxSession = [[MXSession alloc] initWithMatrixRestClient:mxRestClient];
+    [
+        mxSession.matrixRestClient login:params success:^(NSDictionary *JSONResponse) {
+            resolve(@(true));
+        } failure:^(NSError *error) {
+            reject(kAuthenticationFailed, @"Cannot login, check your credentials", nil);
+        }
     ];
 }
 

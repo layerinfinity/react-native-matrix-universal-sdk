@@ -1,16 +1,18 @@
 package com.layerinfinity.matrixuniversalsdk
 
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableArray
 import com.layerinfinity.matrixuniversalsdk.key.AuthenticationKey
 import com.layerinfinity.matrixuniversalsdk.key.HomeServerKey
 import com.layerinfinity.matrixuniversalsdk.key.RoomKey
@@ -18,12 +20,21 @@ import kotlinx.coroutines.launch
 import org.matrix.android.sdk.api.Matrix
 import org.matrix.android.sdk.api.MatrixConfiguration
 import org.matrix.android.sdk.api.auth.data.HomeServerConnectionConfig
+import org.matrix.android.sdk.api.failure.GlobalError
+import org.matrix.android.sdk.api.listeners.ProgressListener
+import org.matrix.android.sdk.api.session.LiveEventListener
 import org.matrix.android.sdk.api.session.Session
+import org.matrix.android.sdk.api.session.crypto.verification.VerificationService
+import org.matrix.android.sdk.api.session.events.model.Event
+import org.matrix.android.sdk.api.session.events.model.toContent
 import org.matrix.android.sdk.api.session.events.model.toModel
 import org.matrix.android.sdk.api.session.room.RoomSortOrder
 import org.matrix.android.sdk.api.session.room.model.Membership
+import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams
+import org.matrix.android.sdk.api.session.room.model.create.CreateRoomPreset
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
+import org.matrix.android.sdk.api.session.statistics.StatisticEvent
 import org.matrix.android.sdk.api.util.JsonDict
 
 class MatrixUniversalSdkModule internal constructor(
@@ -33,14 +44,13 @@ class MatrixUniversalSdkModule internal constructor(
 ) :
   ReactContextBaseJavaModule(
     ctx
-  ) {
+  ), ProgressListener, VerificationService.Listener, Session.Listener {
   private lateinit var matrix: Matrix
 
   override fun getName(): String {
     return NAME
   }
 
-  // Don't forget to open the session and start syncing.
   val lastSession: Session?
     get() {
       val lastSession = matrix.authenticationService().getLastAuthenticatedSession()
@@ -108,6 +118,8 @@ class MatrixUniversalSdkModule internal constructor(
         SessionHolder.currentSession = session
         session.open()
         session.syncService().startSync(true)
+        session.addListener(this@MatrixUniversalSdkModule)
+
         promise.resolve("connected")
       }
     }
@@ -115,16 +127,18 @@ class MatrixUniversalSdkModule internal constructor(
 
   @ReactMethod
   fun getRoom(roomId: String, promise: Promise) {
-    val room = SessionHolder.currentSession?.roomService()?.getRoom(roomId)
+    val room = SessionHolder.currentSession!!.roomService().getRoom(roomId)
     if (room !== null) {
       val messageContent = room.roomSummary()?.latestPreviewableEvent?.root?.getClearContent()
         .toModel<MessageContent>()
-      val lastMsgContent = messageContent?.body ?: ""
+      val lastMsgContent = messageContent?.body ?: "";
 
       val throwback = Arguments.createMap().apply {
         putString(RoomKey.ROOM_ID, room.roomId)
         putString(RoomKey.DISPLAY_NAME, room.roomSummary()?.displayName)
         putString(RoomKey.LAST_MESSAGE, lastMsgContent)
+
+        val content = room.roomSummary()?.directUserPresence
       }
 
       promise.resolve(throwback)
@@ -138,30 +152,73 @@ class MatrixUniversalSdkModule internal constructor(
     }
     val defaultRoomSortOrder = RoomSortOrder.ACTIVITY
 
-    val rooms = SessionHolder.currentSession?.roomService()?.getRoomSummaries(
+    val rooms = SessionHolder.currentSession!!.roomService().getRoomSummaries(
       roomSummariesQuery,
       defaultRoomSortOrder
     )
 
-    if (rooms !== null) {
-      val throwback = rooms.map { it ->
-        Arguments.createMap().apply {
-          val messageContent = it.latestPreviewableEvent?.root?.getClearContent()
-            .toModel<MessageContent>()
-          val lastMsgContent = messageContent?.body ?: ""
-          putString(RoomKey.ROOM_ID, it.roomId)
-          putString(RoomKey.DISPLAY_NAME, it.displayName)
-          putString(RoomKey.LAST_MESSAGE, lastMsgContent)
-        }
+    val throwback = rooms.map { singleItem ->
+      Arguments.createMap().apply {
+        val messageContent = singleItem.latestPreviewableEvent?.root?.getClearContent()
+          .toModel<MessageContent>()
+        val lastMsgContent = messageContent?.body ?: ""
+        val senderId = singleItem.latestPreviewableEvent?.root?.senderId ?: "";
+
+        putString(RoomKey.ROOM_ID, singleItem.roomId)
+        putString(RoomKey.DISPLAY_NAME, singleItem.displayName)
+        putString(RoomKey.LAST_MESSAGE, lastMsgContent)
       }
-      promise.resolve(throwback)
-    } else {
-      promise.reject(Error("Room object is null"))
+    }
+    Log.v(TAG, "gogogo=" + rooms.size.toString());
+
+//    promise.resolve(throwback)
+  }
+
+  @ReactMethod
+  fun createRoom(roomName: String, participants: ReadableArray) {
+    val createRoomParams = CreateRoomParams()
+    createRoomParams.name = roomName
+    createRoomParams.preset = CreateRoomPreset.PRESET_TRUSTED_PRIVATE_CHAT
+    createRoomParams.isDirect = true
+
+
+    val arr: MutableList<String> = mutableListOf()
+    for (i in 0 until participants.size()) {
+      arr.add(participants.getString(i))
+    }
+    createRoomParams.invitedUserIds = arr
+    (ctx.currentActivity as AppCompatActivity).lifecycleScope.launch {
+      try {
+        SessionHolder.currentSession!!.roomService().createRoom(createRoomParams)
+      } catch (failure: Throwable) {
+        // Code...
+      }
     }
   }
 
-  fun createRoom(roomName: String, participants: WritableArray) {
 
+  override fun onProgress(progress: Int, total: Int) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onGlobalError(session: Session, globalError: GlobalError) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onNewInvitedRoom(session: Session, roomId: String) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onClearCache(session: Session) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onSessionStarted(session: Session) {
+    Log.d("HEHEEH", "HIHI")
+  }
+
+  override fun onSessionStopped(session: Session) {
+    Log.d("HEHEEH", "HIHI")
   }
 
   companion object {
