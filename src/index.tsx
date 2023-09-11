@@ -1,5 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import type { LoginParamsType, RoomType } from './types';
+import type { LoginJwtParamsType, LoginParamsType, RoomType } from './types';
 
 const LINKING_ERROR =
   `The package 'react-native-matrix-universal-sdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -31,6 +31,10 @@ export function createClient(url: string): Promise<void> {
 
 export function login(params: LoginParamsType): Promise<void> {
   return MatrixUniversalSdk.login(params);
+}
+
+export function loginWithJwt(params: LoginJwtParamsType): Promise<void> {
+  return MatrixUniversalSdk.loginWithJwt(params);
 }
 
 export function getRoom(roomId: string): Promise<RoomType> {

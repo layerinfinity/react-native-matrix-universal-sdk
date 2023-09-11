@@ -70,3 +70,4 @@ android/keystores/debug.keystore
 lib/
 Podfile.lock
 package-lock.json
+dev-android.sh

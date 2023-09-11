@@ -10,6 +10,11 @@ export type LoginParamsType = {
   password: string;
 };
 
+export type LoginJwtParamsType = {
+  homeServerUrl: string;
+  jwtToken: string;
+};
+
 export type RoomType = {
   roomId: string;
   displayName: string;

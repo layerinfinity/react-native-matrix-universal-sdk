@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text, Button, NativeModules } from 'react-native';
-import { createClient, login } from '../../';
+import { createClient, loginWithJwt } from '../../';
 
 export default function App() {
   const [result] = React.useState<number | undefined>();
@@ -12,10 +12,9 @@ export default function App() {
   }
 
   async function loginWithPw() {
-    const resp = await login({
+    const resp = await loginWithJwt({
       homeServerUrl: 'https://matrix.tauhu.cloud/',
-      username: 'gm.doko',
-      password: 'test123456',
+      jwtToken: process.env.GM_JWT_TOKEN || '',
     });
     console.log(resp);
   }
@@ -46,6 +45,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 22,
   },
   box: {
     width: 60,

@@ -24,6 +24,7 @@ import org.matrix.android.sdk.api.session.room.RoomSortOrder
 import org.matrix.android.sdk.api.session.room.model.Membership
 import org.matrix.android.sdk.api.session.room.model.message.MessageContent
 import org.matrix.android.sdk.api.session.room.roomSummaryQueryParams
+import org.matrix.android.sdk.api.util.JsonDict
 
 class MatrixUniversalSdkModule internal constructor(
   private val ctx: ReactApplicationContext,
@@ -72,11 +73,10 @@ class MatrixUniversalSdkModule internal constructor(
 
   // Use this to login
   @ReactMethod
-  fun login(params: ReadableMap, promise: Promise) {
+  fun loginWithJwt(params: ReadableMap, promise: Promise) {
     // Try this.
     val homeServerUri = params.getString(HomeServerKey.HOME_SERVER_URL)
-    val username = params.getString(AuthenticationKey.USERNAME_KEY)!!.trim()
-    val password = params.getString(AuthenticationKey.PASSWORD_KEY)!!.trim()
+    val gmToken = params.getString(AuthenticationKey.GM_JWT_TOKEN)!!.trim()
     val homeServerConnectionConfig = try {
       HomeServerConnectionConfig
         .Builder()
@@ -89,17 +89,22 @@ class MatrixUniversalSdkModule internal constructor(
 
     (ctx.currentActivity as AppCompatActivity).lifecycleScope.launch {
       try {
-        matrix.authenticationService().directAuthentication(
-          homeServerConnectionConfig,
-          username,
-          password,
-          "chatgm-matrix",
-        )
+        val params: JsonDict = mapOf("type" to "org.matrix.login.jwt", "token" to gmToken)
+        matrix.authenticationService().getLoginFlow(homeServerConnectionConfig)
+        matrix.authenticationService().getLoginWizard().loginCustom(params)
+        // Old method
+        //        matrix.authenticationService().directAuthentication(
+        //          homeServerConnectionConfig,
+        //          username,
+        //          password,
+        //          "chatgm-matrix",
+        //        )
       } catch (failure: Throwable) {
         promise.reject(Error(failure))
         Toast.makeText(ctx, "Failure: $failure", Toast.LENGTH_SHORT).show()
         null
       }?.let { session ->
+        Toast.makeText(ctx, "Success: ${session.myUserId} ${session.sessionId}", Toast.LENGTH_SHORT).show()
         SessionHolder.currentSession = session
         session.open()
         session.syncService().startSync(true)
